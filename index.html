@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fast Eddie Tools</title>
+<style>
+  :root {
+    --bg: #F8F8F8;
+    --card-bg: #FFFFFF;
+    --text: #111111;
+    --text-secondary: #555555;
+    --accent: #2563EB;
+    --border: #E5E5E5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+  header {
+    margin-bottom: 40px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin: 0;
+  }
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin: 32px 0 12px;
+  }
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  a.card {
+    display: block;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  a.card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 1px 6px rgba(37, 99, 235, 0.12);
+  }
+  .card-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .empty-note {
+    font-size: 14px;
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  footer {
+    margin-top: 48px;
+    font-size: 12px;
+    color: #999;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Fast Eddie Tools</h1>
+      <p class="subtitle">A collection of standalone planning calculators and dashboards.</p>
+    </header>
+
+    <div class="section-label">Tools</div>
+    <div class="card-list">
+      <!-- Add a card per tool as it's published, e.g.:
+      <a class="card" href="./retirement-monte-carlo.html">
+        <div class="card-title">Retirement Monte Carlo Simulator</div>
+        <div class="card-desc">Stress-test withdrawal rates and allocation mixes across market regimes.</div>
+      </a>
+      -->
+      <div class="empty-note">No tools published yet — check back soon.</div>
+    </div>
+
+    <footer>
+      Personal planning tools. Figures shown in any linked calculator are illustrative placeholders, not real financial data.
+    </footer>
+  </div>
+</body>
+</html>
