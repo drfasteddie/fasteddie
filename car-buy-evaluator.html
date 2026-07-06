@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Purchase Evaluator</title>
+<style>
+  :root {
+    --bg: #F8F8F8;
+    --card-bg: #FFFFFF;
+    --text: #111111;
+    --text-secondary: #555555;
+    --accent: #2563EB;
+    --border: #E5E5E5;
+    --green: #16A34A;
+    --amber: #D97706;
+    --red: #DC2626;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 20px 80px; }
+  a.back { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+  a.back:hover { color: var(--accent); }
+  h1 { font-size: 24px; margin: 18px 0 4px; letter-spacing: -0.02em; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0 0 28px; }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .field .val { color: var(--accent); font-weight: 700; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  input[type=number], select {
+    width: 100%; padding: 8px 10px; font-size: 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: inherit; background: #fff; color: var(--text);
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-secondary); margin: 18px 0 10px;
+  }
+  .toggle-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+  button.run {
+    width: 100%; padding: 12px; background: var(--accent); color: #fff;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
+  }
+  button.run:hover { opacity: 0.92; }
+  .verdict {
+    padding: 16px 18px; border-radius: 12px; margin-bottom: 16px; font-size: 15px; font-weight: 700;
+  }
+  .verdict.buy { background: #DCFCE7; color: var(--green); }
+  .verdict.negotiate { background: #FEF3C7; color: var(--amber); }
+  .verdict.pass { background: #FEE2E2; color: var(--red); }
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .metric { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .metric .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .metric .value { font-size: 24px; font-weight: 700; }
+  .metric .subnote { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .flag {
+    font-size: 12px; background: #FEF3C7; color: #92400E; border-radius: 8px; padding: 8px 12px; margin-top: 10px;
+  }
+  svg { width: 100%; height: auto; display: block; }
+  footer { margin-top: 40px; font-size: 12px; color: #999; border-top: 1px solid var(--border); padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./index.html">&larr; All tools</a>
+  <h1>Car Purchase Evaluator</h1>
+  <p class="subtitle">Illustrative model — all defaults are round placeholder numbers. Swap in your own deal terms to run a real evaluation.</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="section-label" style="margin-top:0;">Deal terms</div>
+      <div class="field">
+        <label>Selling price <span class="val" id="lblPrice">$60,000</span></label>
+        <input type="range" id="price" min="15000" max="300000" step="1000" value="60000">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Dealer fees</label>
+          <input type="number" id="fees" value="899">
+        </div>
+        <div class="field">
+          <label>Est. original MSRP</label>
+          <input type="number" id="msrp" value="75000">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Sales tax rate</label>
+          <input type="number" id="taxRate" value="6" step="0.1">
+        </div>
+        <div class="field">
+          <label>Title/reg fees</label>
+          <input type="number" id="titleFees" value="500">
+        </div>
+      </div>
+
+      <div class="section-label">Usage</div>
+      <div class="row2">
+        <div class="field">
+          <label>Current mileage</label>
+          <input type="number" id="mileage" value="20000">
+        </div>
+        <div class="field">
+          <label>Miles / year</label>
+          <input type="number" id="milesPerYear" value="10000">
+        </div>
+      </div>
+      <div class="field">
+        <label>Planned hold period (years) <span class="val" id="lblHold">4</span></label>
+        <input type="range" id="hold" min="1" max="10" step="1" value="4">
+      </div>
+
+      <div class="section-label">Depreciation & financing</div>
+      <div class="field">
+        <label>Annual depreciation rate <span class="val" id="lblDep">12%</span></label>
+        <input type="range" id="depRate" min="5" max="25" step="1" value="12">
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="financed" checked>
+        <label for="financed" style="margin:0;">Financed (uncheck for cash purchase)</label>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Down payment</label>
+          <input type="number" id="downPayment" value="10000">
+        </div>
+        <div class="field">
+          <label>APR %</label>
+          <input type="number" id="apr" value="6.5" step="0.1">
+        </div>
+      </div>
+      <div class="field">
+        <label>Loan term (months) <span class="val" id="lblTerm">60</span></label>
+        <input type="range" id="term" min="24" max="84" step="12" value="60">
+      </div>
+      <div class="field">
+        <label>Opportunity cost rate (cash) <span class="val" id="lblOpp">7%</span></label>
+        <input type="range" id="oppRate" min="2" max="12" step="0.5" value="7">
+      </div>
+
+      <button class="run" id="runBtn">Run evaluation</button>
+    </div>
+
+    <div>
+      <div class="verdict" id="verdictBox">—</div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="label">Out-the-door price</div>
+          <div class="value" id="outOTD">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">Captured depreciation</div>
+          <div class="value" id="outCaptured">—</div>
+          <div class="subnote">MSRP minus current price — what the first owner absorbed</div>
+        </div>
+        <div class="metric">
+          <div class="label" id="labelInterestOrOpp">Total interest (loan life)</div>
+          <div class="value" id="outInterest">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">Cost per mile (hold period)</div>
+          <div class="value" id="outCPM">—</div>
+        </div>
+      </div>
+      <div class="flag" id="termFlag" style="display:none;"></div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="section-label" style="margin-top:0;">Projected value over hold period</div>
+        <svg id="chart" viewBox="0 0 640 280" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Decision support, not financial advice. Figures are placeholders — replace with your own deal terms to evaluate a real purchase.
+  </footer>
+</div>
+
+<script>
+function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+function loanPayment(principal, aprPct, months) {
+  const r = (aprPct / 100) / 12;
+  if (r === 0) return principal / months;
+  return principal * r / (1 - Math.pow(1 + r, -months));
+}
+
+function run() {
+  const price = +document.getElementById('price').value;
+  const fees = +document.getElementById('fees').value;
+  const msrp = +document.getElementById('msrp').value;
+  const taxRate = +document.getElementById('taxRate').value / 100;
+  const titleFees = +document.getElementById('titleFees').value;
+  const mileage = +document.getElementById('mileage').value;
+  const milesPerYear = +document.getElementById('milesPerYear').value;
+  const holdYears = +document.getElementById('hold').value;
+  const depRate = +document.getElementById('depRate').value / 100;
+  const financed = document.getElementById('financed').checked;
+  const downPayment = +document.getElementById('downPayment').value;
+  const apr = +document.getElementById('apr').value;
+  const termMonths = +document.getElementById('term').value;
+  const oppRate = +document.getElementById('oppRate').value / 100;
+
+  const taxableBase = price + fees;
+  const salesTax = taxableBase * taxRate;
+  const otd = taxableBase + salesTax + titleFees;
+
+  const captured = Math.max(0, msrp - price);
+
+  // depreciation curve
+  const trajectory = [];
+  for (let y = 0; y <= holdYears; y++) {
+    trajectory.push(price * Math.pow(1 - depRate, y));
+  }
+  const resaleValue = trajectory[trajectory.length - 1];
+  const capitalLoss = otd - resaleValue;
+
+  let interestOrOpp, financeNote = '', costPerMileExtra = 0;
+  if (financed) {
+    const principal = Math.max(0, otd - downPayment);
+    const payment = loanPayment(principal, apr, termMonths);
+    const totalPaid = payment * termMonths;
+    interestOrOpp = totalPaid - principal;
+    costPerMileExtra = interestOrOpp;
+    document.getElementById('labelInterestOrOpp').textContent = 'Total interest (loan life)';
+    if (termMonths >= 72) {
+      document.getElementById('termFlag').style.display = 'block';
+      document.getElementById('termFlag').textContent =
+        `${termMonths}-month term flagged: long financing periods materially inflate total interest cost — consider a shorter term or larger down payment.`;
+    } else {
+      document.getElementById('termFlag').style.display = 'none';
+    }
+  } else {
+    interestOrOpp = otd * oppRate * holdYears;
+    costPerMileExtra = interestOrOpp;
+    document.getElementById('labelInterestOrOpp').textContent = 'Opportunity cost (cash, ' + holdYears + 'yr)';
+    document.getElementById('termFlag').style.display = 'none';
+  }
+
+  const totalMiles = milesPerYear * holdYears;
+  const cpm = (capitalLoss + costPerMileExtra) / Math.max(1, totalMiles);
+
+  document.getElementById('outOTD').textContent = fmt(otd);
+  document.getElementById('outCaptured').textContent = fmt(captured);
+  document.getElementById('outInterest').textContent = fmt(interestOrOpp);
+  document.getElementById('outCPM').textContent = '$' + cpm.toFixed(2) + '/mi';
+
+  // simple verdict heuristic based on cost per mile and depreciation severity
+  const verdictBox = document.getElementById('verdictBox');
+  let verdictText, verdictClass;
+  if (cpm < 0.35 && capitalLoss / otd < 0.35) {
+    verdictText = 'Verdict: Buy — cost per mile and depreciation both look reasonable for this hold period.';
+    verdictClass = 'buy';
+  } else if (cpm < 0.60) {
+    verdictText = 'Verdict: Negotiate — numbers are workable but there is room to improve price or terms.';
+    verdictClass = 'negotiate';
+  } else {
+    verdictText = 'Verdict: Pass or renegotiate hard — cost per mile is high relative to the hold period.';
+    verdictClass = 'pass';
+  }
+  verdictBox.textContent = verdictText;
+  verdictBox.className = 'verdict ' + verdictClass;
+
+  drawChart(trajectory, holdYears);
+}
+
+function drawChart(trajectory, years) {
+  const svg = document.getElementById('chart');
+  const W = 640, H = 280, padL = 60, padB = 30, padT = 10, padR = 10;
+  const maxVal = Math.max(...trajectory) * 1.05 || 1;
+  const x = i => padL + (i / years) * (W - padL - padR);
+  const y = v => H - padB - (v / maxVal) * (H - padT - padB);
+
+  const path = trajectory.map((v, i) => (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(v).toFixed(1)).join(' ');
+
+  const gridLines = [];
+  for (let g = 0; g <= 4; g++) {
+    const val = (maxVal / 4) * g;
+    gridLines.push(
+      `<line x1="${padL}" y1="${y(val).toFixed(1)}" x2="${W - padR}" y2="${y(val).toFixed(1)}" stroke="#E5E5E5" stroke-width="1"/>` +
+      `<text x="${padL - 8}" y="${(y(val) + 4).toFixed(1)}" font-size="10" fill="#555" text-anchor="end">${fmt(val)}</text>`
+    );
+  }
+
+  svg.innerHTML = `
+    ${gridLines.join('')}
+    <path d="${path}" fill="none" stroke="#2563EB" stroke-width="2.5"/>
+    <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#111" stroke-width="1"/>
+    <text x="${padL}" y="${H - 8}" font-size="10" fill="#555">Year 0</text>
+    <text x="${(W - padR - 40)}" y="${H - 8}" font-size="10" fill="#555">Year ${years}</text>
+  `;
+}
+
+const bindings = [
+  ['price', 'lblPrice', v => fmt(v)],
+  ['hold', 'lblHold', v => v],
+  ['depRate', 'lblDep', v => v + '%'],
+  ['term', 'lblTerm', v => v],
+  ['oppRate', 'lblOpp', v => v + '%']
+];
+bindings.forEach(([id, lblId, fn]) => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => { document.getElementById(lblId).textContent = fn(el.value); });
+});
+
+document.getElementById('runBtn').addEventListener('click', run);
+window.addEventListener('load', run);
+</script>
+</body>
+</html>

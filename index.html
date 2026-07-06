@@ -21,74 +21,31 @@
     color: var(--text);
     min-height: 100vh;
   }
-  .wrap {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 56px 24px 80px;
+  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 24px 80px; }
+  header { margin-bottom: 40px; }
+  h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .subtitle { color: var(--text-secondary); font-size: 15px; margin: 0; }
+  .category-label {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--accent); margin: 36px 0 12px;
+    display: flex; align-items: center; gap: 8px;
   }
-  header {
-    margin-bottom: 40px;
-  }
-  h1 {
-    font-size: 28px;
-    margin: 0 0 8px;
-    letter-spacing: -0.02em;
-  }
-  .subtitle {
-    color: var(--text-secondary);
-    font-size: 15px;
-    margin: 0;
-  }
-  .section-label {
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--text-secondary);
-    margin: 32px 0 12px;
-  }
-  .card-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  .category-label:first-of-type { margin-top: 0; }
+  .card-list { display: flex; flex-direction: column; gap: 10px; }
   a.card {
-    display: block;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 18px;
-    text-decoration: none;
-    color: var(--text);
+    display: block; background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; text-decoration: none; color: var(--text);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
-  a.card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 1px 6px rgba(37, 99, 235, 0.12);
-  }
-  .card-title {
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 2px;
-  }
-  .card-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
+  a.card:hover { border-color: var(--accent); box-shadow: 0 1px 6px rgba(37, 99, 235, 0.12); }
+  .card-title { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+  .card-desc { font-size: 13px; color: var(--text-secondary); }
   .empty-note {
-    font-size: 14px;
-    color: var(--text-secondary);
-    background: var(--card-bg);
-    border: 1px dashed var(--border);
-    border-radius: 10px;
-    padding: 18px;
+    font-size: 13px; color: var(--text-secondary); background: var(--card-bg);
+    border: 1px dashed var(--border); border-radius: 10px; padding: 14px 18px;
   }
   footer {
-    margin-top: 48px;
-    font-size: 12px;
-    color: #999;
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
+    margin-top: 48px; font-size: 12px; color: #999; border-top: 1px solid var(--border); padding-top: 16px;
   }
 </style>
 </head>
@@ -99,12 +56,25 @@
       <p class="subtitle">A collection of standalone planning calculators and dashboards.</p>
     </header>
 
-    <div class="section-label">Tools</div>
+    <div class="category-label">Retirement & Financial Planning</div>
     <div class="card-list">
       <a class="card" href="./retirement-monte-carlo.html">
         <div class="card-title">Retirement Monte Carlo Simulator</div>
         <div class="card-desc">Stress-test withdrawal rates, Social Security timing, and allocation mixes across market regimes.</div>
       </a>
+    </div>
+
+    <div class="category-label">Cars & Major Purchases</div>
+    <div class="card-list">
+      <a class="card" href="./car-buy-evaluator.html">
+        <div class="card-title">Car Purchase Evaluator</div>
+        <div class="card-desc">Out-the-door pricing, depreciation curve, financing cost, and cost-per-mile for any deal.</div>
+      </a>
+    </div>
+
+    <div class="category-label">Travel</div>
+    <div class="card-list">
+      <div class="empty-note">No tools published yet — check back soon.</div>
     </div>
 
     <footer>
