@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retirement Monte Carlo Simulator</title>
+<style>
+  :root {
+    --bg: #F8F8F8;
+    --card-bg: #FFFFFF;
+    --text: #111111;
+    --text-secondary: #555555;
+    --accent: #2563EB;
+    --border: #E5E5E5;
+    --green: #16A34A;
+    --amber: #D97706;
+    --red: #DC2626;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 20px 80px; }
+  a.back { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+  a.back:hover { color: var(--accent); }
+  h1 { font-size: 24px; margin: 18px 0 4px; letter-spacing: -0.02em; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0 0 28px; }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: flex; justify-content: space-between;
+    font-size: 13px; font-weight: 600; margin-bottom: 6px;
+  }
+  .field .val { color: var(--accent); font-weight: 700; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  input[type=number], select {
+    width: 100%; padding: 8px 10px; font-size: 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: inherit; background: #fff; color: var(--text);
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .toggle-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+  .section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-secondary); margin: 20px 0 10px;
+  }
+  button.run {
+    width: 100%; padding: 12px; background: var(--accent); color: #fff;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-top: 8px;
+  }
+  button.run:hover { opacity: 0.92; }
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .metric {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+  }
+  .metric .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .metric .value { font-size: 26px; font-weight: 700; }
+  .metric .value.big { font-size: 30px; }
+  .pill {
+    display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  }
+  .pill.good { background: #DCFCE7; color: var(--green); }
+  .pill.ok { background: #FEF3C7; color: var(--amber); }
+  .pill.bad { background: #FEE2E2; color: var(--red); }
+  svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+  .legend span::before {
+    content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+    margin-right: 5px; vertical-align: -1px;
+  }
+  .legend .l1::before { background: #93C5FD; }
+  .legend .l2::before { background: var(--accent); }
+  .legend .l3::before { background: #1E3A8A; }
+  .note {
+    font-size: 12px; color: var(--text-secondary); background: #F1F5F9; border-radius: 8px;
+    padding: 10px 12px; margin-top: 14px; line-height: 1.5;
+  }
+  footer { margin-top: 40px; font-size: 12px; color: #999; border-top: 1px solid var(--border); padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./index.html">&larr; All tools</a>
+  <h1>Retirement Monte Carlo Simulator</h1>
+  <p class="subtitle">Illustrative model — all defaults are round placeholder numbers. Adjust the inputs to run your own scenario; nothing is saved or sent anywhere.</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="section-label">Portfolio & timeline</div>
+      <div class="field">
+        <label>Starting portfolio at retirement <span class="val" id="lblPortfolio">$2,000,000</span></label>
+        <input type="range" id="portfolio" min="500000" max="8000000" step="50000" value="2000000">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Retirement age</label>
+          <input type="number" id="retireAge" min="45" max="75" value="62">
+        </div>
+        <div class="field">
+          <label>Plan to age</label>
+          <input type="number" id="planAge" min="80" max="100" value="95">
+        </div>
+      </div>
+
+      <div class="section-label">Spending</div>
+      <div class="field">
+        <label>Annual withdrawal (today's $) <span class="val" id="lblSpend">$100,000</span></label>
+        <input type="range" id="spend" min="30000" max="350000" step="5000" value="100000">
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="guardrails" checked>
+        <label for="guardrails" style="margin:0;">Guyton-Klinger spending guardrails</label>
+      </div>
+
+      <div class="section-label">Social Security</div>
+      <div class="row2">
+        <div class="field">
+          <label>Monthly benefit</label>
+          <input type="number" id="ssAmount" min="0" max="6000" step="50" value="2800">
+        </div>
+        <div class="field">
+          <label>Start age</label>
+          <select id="ssAge">
+            <option value="67">67</option>
+            <option value="70" selected>70</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label">Allocation & regime</div>
+      <div class="field">
+        <label>Equity allocation <span class="val" id="lblAlloc">70%</span></label>
+        <input type="range" id="alloc" min="30" max="100" step="5" value="70">
+      </div>
+      <div class="field">
+        <label>Return regime</label>
+        <select id="regime">
+          <option value="conservative">Conservative</option>
+          <option value="base" selected>Base</option>
+          <option value="optimistic">Optimistic</option>
+        </select>
+      </div>
+
+      <button class="run" id="runBtn">Run simulation</button>
+      <div class="note">Regimes use real (inflation-adjusted) return assumptions. 2,000 simulated paths per run. Small variation between runs (±0.5–1 pt) is normal sampling noise, not a real change.</div>
+    </div>
+
+    <div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="label">Success probability</div>
+          <div class="value big" id="outSuccess">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">Median ending balance</div>
+          <div class="value" id="outMedian">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">10th percentile ending</div>
+          <div class="value" id="outP10">—</div>
+        </div>
+        <div class="metric">
+          <div class="label">90th percentile ending</div>
+          <div class="value" id="outP90">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label" style="margin-top:0;">Portfolio trajectory (10th / 50th / 90th percentile)</div>
+        <svg id="chart" viewBox="0 0 640 320" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="legend">
+          <span class="l1">10th percentile</span>
+          <span class="l2">Median</span>
+          <span class="l3">90th percentile</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Illustrative planning tool. Not financial advice. Figures are placeholders — replace with your own numbers to model your situation.
+  </footer>
+</div>
+
+<script>
+const regimes = {
+  conservative: { eq: [0.040, 0.18], bond: [0.010, 0.055] },
+  base:         { eq: [0.055, 0.17], bond: [0.020, 0.055] },
+  optimistic:   { eq: [0.065, 0.16], bond: [0.025, 0.050] }
+};
+const CORR = 0.05;
+
+function randNormal() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function fmt(n) {
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+
+function runSim() {
+  const portfolio0 = +document.getElementById('portfolio').value;
+  const retireAge = +document.getElementById('retireAge').value;
+  const planAge = +document.getElementById('planAge').value;
+  const spend0 = +document.getElementById('spend').value;
+  const guardrailsOn = document.getElementById('guardrails').checked;
+  const ssMonthly = +document.getElementById('ssAmount').value;
+  const ssStartAge = +document.getElementById('ssAge').value;
+  const allocEq = +document.getElementById('alloc').value / 100;
+  const regimeKey = document.getElementById('regime').value;
+  const regime = regimes[regimeKey];
+
+  const years = Math.max(1, planAge - retireAge);
+  const paths = 2000;
+  const initialWR = spend0 / portfolio0;
+
+  const allTrajectories = [];
+  let successes = 0;
+  const endings = [];
+
+  for (let p = 0; p < paths; p++) {
+    let bal = portfolio0;
+    let spend = spend0;
+    const traj = [bal];
+    let failed = false;
+
+    for (let y = 1; y <= years; y++) {
+      const age = retireAge + y;
+      const ssIncome = age >= ssStartAge ? ssMonthly * 12 : 0;
+      const netWithdrawal = Math.max(0, spend - ssIncome);
+
+      bal -= netWithdrawal;
+      if (bal <= 0) { bal = 0; failed = true; }
+
+      const z1 = randNormal();
+      const z2 = randNormal();
+      const eqRet = regime.eq[0] + regime.eq[1] * z1;
+      const bondRet = regime.bond[0] + regime.bond[1] * (CORR * z1 + Math.sqrt(1 - CORR * CORR) * z2);
+      const portRet = allocEq * eqRet + (1 - allocEq) * bondRet;
+
+      bal = bal * (1 + portRet);
+      if (bal < 0) bal = 0;
+
+      if (guardrailsOn && bal > 0) {
+        const currentWR = spend / bal;
+        if (currentWR > 1.2 * initialWR) spend = Math.max(spend0 * 0.8, spend * 0.9);
+        else if (currentWR < 0.8 * initialWR) spend = Math.min(spend0 * 1.15, spend * 1.1);
+      }
+
+      traj.push(bal);
+    }
+
+    if (!failed && traj[traj.length - 1] > 0) successes++;
+    endings.push(traj[traj.length - 1]);
+    allTrajectories.push(traj);
+  }
+
+  const successRate = (successes / paths) * 100;
+
+  // percentile bands per year
+  const bands = [];
+  for (let y = 0; y <= years; y++) {
+    const col = allTrajectories.map(t => t[y]).sort((a, b) => a - b);
+    const p10 = col[Math.floor(0.10 * (paths - 1))];
+    const p50 = col[Math.floor(0.50 * (paths - 1))];
+    const p90 = col[Math.floor(0.90 * (paths - 1))];
+    bands.push({ p10, p50, p90 });
+  }
+
+  endings.sort((a, b) => a - b);
+  const endP10 = endings[Math.floor(0.10 * (paths - 1))];
+  const endP50 = endings[Math.floor(0.50 * (paths - 1))];
+  const endP90 = endings[Math.floor(0.90 * (paths - 1))];
+
+  document.getElementById('outSuccess').textContent = successRate.toFixed(1) + '%';
+  document.getElementById('outSuccess').style.color =
+    successRate >= 90 ? '#16A34A' : successRate >= 75 ? '#D97706' : '#DC2626';
+  document.getElementById('outMedian').textContent = fmt(endP50);
+  document.getElementById('outP10').textContent = fmt(endP10);
+  document.getElementById('outP90').textContent = fmt(endP90);
+
+  drawChart(bands, years);
+}
+
+function drawChart(bands, years) {
+  const svg = document.getElementById('chart');
+  const W = 640, H = 320, padL = 60, padB = 30, padT = 10, padR = 10;
+  const maxVal = Math.max(...bands.map(b => b.p90)) * 1.05 || 1;
+
+  const x = i => padL + (i / years) * (W - padL - padR);
+  const y = v => H - padB - (v / maxVal) * (H - padT - padB);
+
+  function pathFor(key) {
+    return bands.map((b, i) => (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(b[key]).toFixed(1)).join(' ');
+  }
+
+  const gridLines = [];
+  for (let g = 0; g <= 4; g++) {
+    const val = (maxVal / 4) * g;
+    gridLines.push(
+      `<line x1="${padL}" y1="${y(val).toFixed(1)}" x2="${W - padR}" y2="${y(val).toFixed(1)}" stroke="#E5E5E5" stroke-width="1"/>` +
+      `<text x="${padL - 8}" y="${(y(val) + 4).toFixed(1)}" font-size="10" fill="#555" text-anchor="end">${fmt(val).replace('$','$').replace(/,000$/,'k')}</text>`
+    );
+  }
+
+  svg.innerHTML = `
+    ${gridLines.join('')}
+    <path d="${pathFor('p90')}" fill="none" stroke="#1E3A8A" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <path d="${pathFor('p50')}" fill="none" stroke="#2563EB" stroke-width="2.5"/>
+    <path d="${pathFor('p10')}" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#111" stroke-width="1"/>
+    <text x="${padL}" y="${H - 8}" font-size="10" fill="#555">Retirement</text>
+    <text x="${(W - padR - 40)}" y="${H - 8}" font-size="10" fill="#555">Year ${years}</text>
+  `;
+}
+
+// live label updates
+const bindings = [
+  ['portfolio', 'lblPortfolio', v => fmt(v)],
+  ['spend', 'lblSpend', v => fmt(v)],
+  ['alloc', 'lblAlloc', v => v + '%']
+];
+bindings.forEach(([id, lblId, fn]) => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    document.getElementById(lblId).textContent = fn(el.value);
+  });
+});
+
+document.getElementById('runBtn').addEventListener('click', runSim);
+window.addEventListener('load', runSim);
+</script>
+</body>
+</html>
